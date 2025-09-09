@@ -1,0 +1,14 @@
+# .NET API 
+backend/src/*/bin/
+backend/src/*/obj/
+backend/src/*/config/
+
+backend/src/CodingJournal.API/appsettings.Development.json
+backend/src/CodingJournal.API/appsettings.Production.json
+
+*.db
+*.sqlite
+*.sqlite3
+
+.idea/
+.vs/
