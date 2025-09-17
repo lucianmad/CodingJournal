@@ -4,13 +4,14 @@ using CodingJournal.Application.Documents.DTOs;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace CodingJournal.Application.Documents;
+namespace CodingJournal.Application.Documents.Actions;
 
 public record GetDocumentQuery(int Id) : IRequest<Result<DocumentDto>>;
 
 public class GetDocumentQueryHandler : IRequestHandler<GetDocumentQuery, Result<DocumentDto>>
 {
     private readonly IApplicationDbContext _context;
+    
     public GetDocumentQueryHandler(IApplicationDbContext context)
     {
         _context = context;

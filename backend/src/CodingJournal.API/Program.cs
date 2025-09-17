@@ -1,5 +1,5 @@
 using CodingJournal.Application.Abstractions;
-using CodingJournal.Application.Documents;
+using CodingJournal.Application.Documents.Actions;
 using CodingJournal.Domain.Data;
 using CodingJournal.Domain.Entities;
 using CodingJournal.Infrastructure;

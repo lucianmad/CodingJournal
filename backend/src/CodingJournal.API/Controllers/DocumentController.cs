@@ -1,4 +1,4 @@
-using CodingJournal.Application.Documents;
+using CodingJournal.Application.Documents.Actions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,9 +16,13 @@ public class DocumentController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? searchTerm = null,
+        [FromQuery] int? categoryId = null)
     {
-        var result = await _mediator.Send(new GetDocumentsQuery());
+        var result = await _mediator.Send(new GetDocumentsQuery("userIdString" ,page, pageSize, searchTerm, categoryId));
         return Ok(result);
     }
     
