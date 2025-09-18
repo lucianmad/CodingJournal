@@ -13,18 +13,12 @@ public record GetDocumentsQuery(
     string? SearchTerm = null,
     int? CategoryId = null) : IRequest<Result<PagedList<DocumentDto>>>;
 
-public class GetDocumentsQueryHandler : IRequestHandler<GetDocumentsQuery, Result<PagedList<DocumentDto>>>
+public class GetDocumentsQueryHandler(IApplicationDbContext context)
+    : IRequestHandler<GetDocumentsQuery, Result<PagedList<DocumentDto>>>
 {
-    private readonly IApplicationDbContext _context;
-
-    public GetDocumentsQueryHandler(IApplicationDbContext context)
-    {
-        _context = context;
-    }
-
     public async Task<Result<PagedList<DocumentDto>>> Handle(GetDocumentsQuery request, CancellationToken cancellationToken)
     {
-        var query = _context.Documents
+        var query = context.Documents
             .Include(d => d.User)
             .Include(d => d.Category)
             .Where(d => d.UserId == request.UserId);

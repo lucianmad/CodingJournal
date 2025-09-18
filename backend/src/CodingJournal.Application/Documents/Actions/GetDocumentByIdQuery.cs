@@ -6,22 +6,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CodingJournal.Application.Documents.Actions;
 
-public record GetDocumentQuery(int Id) : IRequest<Result<DocumentDto>>;
+public record GetDocumentByIdQuery(string UserId, int Id) : IRequest<Result<DocumentDto>>;
 
-public class GetDocumentQueryHandler : IRequestHandler<GetDocumentQuery, Result<DocumentDto>>
+public class GetDocumentByIdQueryHandler(IApplicationDbContext context)
+    : IRequestHandler<GetDocumentByIdQuery, Result<DocumentDto>>
 {
-    private readonly IApplicationDbContext _context;
-    
-    public GetDocumentQueryHandler(IApplicationDbContext context)
+    public async Task<Result<DocumentDto>> Handle(GetDocumentByIdQuery request, CancellationToken cancellationToken)
     {
-        _context = context;
-    }
-    
-    public async Task<Result<DocumentDto>> Handle(GetDocumentQuery request, CancellationToken cancellationToken)
-    {
-        var document = await _context.Documents
+        var document = await context.Documents
             .Include(d => d.User)
             .Include(d => d.Category)
+            .Where(d => d.UserId == request.UserId)
             .FirstOrDefaultAsync(d => d.Id == request.Id, cancellationToken);
         
         if (document == null)

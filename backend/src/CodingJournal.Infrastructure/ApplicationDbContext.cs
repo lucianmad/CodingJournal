@@ -7,12 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CodingJournal.Infrastructure;
 
-public class ApplicationDbContext : IdentityDbContext<User>, IApplicationDbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    : IdentityDbContext<User>(options), IApplicationDbContext
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    {
-    }
-    
     public DbSet<Category> Categories { get; set; }
     public DbSet<Document> Documents { get; set; }
     
