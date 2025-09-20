@@ -1,4 +1,3 @@
-using System.Reflection;
 using CodingJournal.Application.Abstractions;
 using CodingJournal.Domain.Entities;
 using CodingJournal.Infrastructure.Configurations;
@@ -12,7 +11,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<Category> Categories { get; set; }
     public DbSet<Document> Documents { get; set; }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

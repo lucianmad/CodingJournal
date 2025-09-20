@@ -1,27 +1,30 @@
+using System.Security.Claims;
 using CodingJournal.Application.Abstractions;
 using CodingJournal.Application.Common;
-using CodingJournal.Application.Documents.DTOs;
+using CodingJournal.Application.Features.Documents.DTOs;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
-namespace CodingJournal.Application.Documents.Actions;
+namespace CodingJournal.Application.Features.Documents.Actions;
 
 public record GetDocumentsQuery(
-    string UserId,
     int Page = 1,
     int PageSize = 10,
     string? SearchTerm = null,
     int? CategoryId = null) : IRequest<Result<PagedList<DocumentDto>>>;
 
-public class GetDocumentsQueryHandler(IApplicationDbContext context)
+public class GetDocumentsQueryHandler(IApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
     : IRequestHandler<GetDocumentsQuery, Result<PagedList<DocumentDto>>>
 {
     public async Task<Result<PagedList<DocumentDto>>> Handle(GetDocumentsQuery request, CancellationToken cancellationToken)
     {
+        var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new Exception("User not found.");
+        
         var query = context.Documents
             .Include(d => d.User)
             .Include(d => d.Category)
-            .Where(d => d.UserId == request.UserId);
+            .Where(d => d.UserId == userId);
         
         if (!string.IsNullOrEmpty(request.SearchTerm))
         {

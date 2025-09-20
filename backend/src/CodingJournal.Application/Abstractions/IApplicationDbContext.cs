@@ -8,4 +8,5 @@ public interface IApplicationDbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Document> Documents { get; set; }
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

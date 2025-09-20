@@ -1,4 +1,4 @@
-using CodingJournal.Application.Authentication.Actions;
+using CodingJournal.Application.Features.Authentication.Actions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,5 +38,15 @@ public class AuthController(IMediator mediator) : ControllerBase
             errors = result.Errors,
             message = "Failed to login user."
         });   
+    }
+    
+    [HttpPost]
+    [Route("logout")]
+    public IActionResult Logout()
+    {
+        return Ok(new
+        {
+            message = "Successfully logged out. Please remove the token from client storage.",
+        });
     }
 }

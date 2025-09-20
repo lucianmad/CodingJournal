@@ -1,11 +1,12 @@
 using CodingJournal.Application.Abstractions;
-using CodingJournal.Application.Authentication.DTOs;
+using CodingJournal.Application.Features.Authentication.DTOs;
 using CodingJournal.Application.Common;
 using CodingJournal.Domain.Entities;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace CodingJournal.Application.Authentication.Actions;
+namespace CodingJournal.Application.Features.Authentication.Actions;
 
 public record LoginCommand(string Email, string Password) : IRequest<Result<AuthResponseDto>>;
 
@@ -29,5 +30,14 @@ public class LoginCommandHandler(IJwtService jwtService, UserManager<User> userM
         var token = jwtService.GenerateToken(user.Id, user.Email!);
         
         return Result<AuthResponseDto>.Success(new AuthResponseDto(user.Id, user.Email!, token, user.FirstName!, user.LastName!));
+    }
+}
+
+public class LoginCommandValidator : AbstractValidator<LoginCommand>
+{
+    public LoginCommandValidator()
+    {
+        RuleFor(x => x.Email).NotEmpty().WithMessage("Email is required.");
+        RuleFor(x => x.Password).NotEmpty().WithMessage("Password is required.");
     }
 }
