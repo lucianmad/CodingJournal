@@ -35,9 +35,16 @@ namespace CodingJournal.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("Name");
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("Name", "UserId")
+                        .IsUnique();
 
                     b.ToTable("Categories");
                 });
@@ -301,6 +308,17 @@ namespace CodingJournal.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("CodingJournal.Domain.Entities.Category", b =>
+                {
+                    b.HasOne("CodingJournal.Domain.Entities.User", "User")
+                        .WithMany("Categories")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("CodingJournal.Domain.Entities.Document", b =>
                 {
                     b.HasOne("CodingJournal.Domain.Entities.Category", "Category")
@@ -311,7 +329,7 @@ namespace CodingJournal.Infrastructure.Migrations
                     b.HasOne("CodingJournal.Domain.Entities.User", "User")
                         .WithMany("Documents")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Category");
@@ -377,6 +395,8 @@ namespace CodingJournal.Infrastructure.Migrations
 
             modelBuilder.Entity("CodingJournal.Domain.Entities.User", b =>
                 {
+                    b.Navigation("Categories");
+
                     b.Navigation("Documents");
                 });
 #pragma warning restore 612, 618

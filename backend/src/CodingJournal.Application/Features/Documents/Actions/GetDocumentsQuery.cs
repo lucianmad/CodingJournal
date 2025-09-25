@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using CodingJournal.Application.Abstractions;
 using CodingJournal.Application.Common;
+using CodingJournal.Application.Common.Extensions;
 using CodingJournal.Application.Features.Documents.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -19,7 +20,13 @@ public class GetDocumentsQueryHandler(IApplicationDbContext context, IHttpContex
 {
     public async Task<Result<PagedList<DocumentDto>>> Handle(GetDocumentsQuery request, CancellationToken cancellationToken)
     {
-        var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new Exception("User not found.");
+        var userIdResult = httpContextAccessor.HttpContext.GetCurrentUserId();
+        if (!userIdResult.IsSuccess)
+        {
+            return Result<PagedList<DocumentDto>>.Failure(userIdResult.Errors);
+        }
+        
+        var userId = userIdResult.Value;
         
         var query = context.Documents
             .Include(d => d.User)

@@ -2,6 +2,7 @@ using System.Reflection.Metadata;
 using System.Security.Claims;
 using CodingJournal.Application.Abstractions;
 using CodingJournal.Application.Common;
+using CodingJournal.Application.Common.Extensions;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -11,12 +12,18 @@ namespace CodingJournal.Application.Features.Documents.Actions;
 
 public record CreateDocumentCommand(string Title, string Content, int? CategoryId) : IRequest<Result<int>>;
 
-public class CreateDocumentCommandHanlder(IApplicationDbContext context, IValidator<CreateDocumentCommand> validator, IHttpContextAccessor httpContextAccessor) 
+public class CreateDocumentCommandHandler(IApplicationDbContext context, IValidator<CreateDocumentCommand> validator, IHttpContextAccessor httpContextAccessor) 
     : IRequestHandler<CreateDocumentCommand, Result<int>>
 {
     public async Task<Result<int>> Handle(CreateDocumentCommand request, CancellationToken cancellationToken)
     {
-        var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new Exception("User not found.");
+        var userIdResult = httpContextAccessor.HttpContext.GetCurrentUserId();
+        if (!userIdResult.IsSuccess)
+        {
+            return Result<int>.Failure(userIdResult.Errors);
+        }
+        
+        var userId = userIdResult.Value;
         
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)

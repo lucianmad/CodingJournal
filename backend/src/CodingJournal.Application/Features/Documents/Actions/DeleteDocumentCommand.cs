@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using CodingJournal.Application.Abstractions;
 using CodingJournal.Application.Common;
+using CodingJournal.Application.Common.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,13 @@ public class DeleteDocumentCommandHandler(IApplicationDbContext context, IHttpCo
 {
     public async Task<Result> Handle(DeleteDocumentCommand request, CancellationToken cancellationToken)
     {
-        var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new Exception("User not found.");
+        var userIdResult = httpContextAccessor.HttpContext.GetCurrentUserId();
+        if (!userIdResult.IsSuccess)
+        {
+            return Result.Failure(userIdResult.Errors);
+        }
+        
+        var userId = userIdResult.Value;
         
         var document = await context.Documents.FirstOrDefaultAsync(x => x.Id == request.Id && x.UserId == userId, cancellationToken);
         if (document == null)

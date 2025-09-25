@@ -1,3 +1,4 @@
+using CodingJournal.API.Middleware;
 using CodingJournal.Application;
 using CodingJournal.Domain.Data;
 using CodingJournal.Infrastructure;
@@ -42,6 +43,8 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

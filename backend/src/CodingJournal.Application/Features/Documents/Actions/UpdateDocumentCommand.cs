@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using CodingJournal.Application.Abstractions;
 using CodingJournal.Application.Common;
+using CodingJournal.Application.Common.Extensions;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -10,12 +11,20 @@ namespace CodingJournal.Application.Features.Documents.Actions;
 
 public record UpdateDocumentCommand(int Id, string Title, string Content, int? CategoryId) : IRequest<Result>;
 
-public class UpdateDocumentCommandHandler(IApplicationDbContext context, IValidator<UpdateDocumentCommand> validator, IHttpContextAccessor httpContextAccessor) 
+public class UpdateDocumentCommandHandler(IApplicationDbContext context, 
+    IValidator<UpdateDocumentCommand> validator, 
+    IHttpContextAccessor httpContextAccessor) 
     : IRequestHandler<UpdateDocumentCommand, Result>
 {
     public async Task<Result> Handle(UpdateDocumentCommand request, CancellationToken cancellationToken)
     {
-        var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new Exception("User not found.");
+        var userIdResult = httpContextAccessor.HttpContext.GetCurrentUserId();
+        if (!userIdResult.IsSuccess)
+        {
+            return Result.Failure(userIdResult.Errors);
+        }
+        
+        var userId = userIdResult.Value;
         
         var validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
@@ -29,7 +38,6 @@ public class UpdateDocumentCommandHandler(IApplicationDbContext context, IValida
         {
             return Result.Failure("Document not found.");
         }
-        
         
         var exists = await context.Documents.AnyAsync(d => d.Title == request.Title && d.UserId == userId && d.Id != document.Id, cancellationToken);
         if (exists)

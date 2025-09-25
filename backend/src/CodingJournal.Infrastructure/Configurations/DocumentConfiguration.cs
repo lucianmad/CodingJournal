@@ -21,7 +21,8 @@ public class DocumentConfiguration : IEntityTypeConfiguration<Document>
         
         builder.HasOne(x => x.User)
             .WithMany(x => x.Documents)
-            .HasForeignKey(x => x.UserId);
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.NoAction);
         
         builder.HasOne(x => x.Category)
             .WithMany(x => x.Documents)

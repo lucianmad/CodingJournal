@@ -9,4 +9,5 @@ public class User : IdentityUser
     public DateTime CreatedAt { get; set; }
     
     public ICollection<Document> Documents { get; set; } = new List<Document>();
+    public ICollection<Category> Categories { get; set; } = new List<Category>();
 }
